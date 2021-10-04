@@ -164,7 +164,7 @@ class Teams extends Controller
     public function create()
     {
         #$message = self::message('info', sprintf('Para criar Times utilize a %s%s%s para sortear os times baseados na partida e em quem confirmou a presença para tal.', '<a href="'.route('automations').'">', 'Automatização de tarefas', '</a>'));
-        $message = self::message('info', 'Para criar Times utilize a Automatização de tarefas para sortear os times baseados na partida e em quem confirmou a presença para tal.');
+        self::message('info', 'Para criar Times utilize a Automatização de tarefas para sortear os times baseados na partida e em quem confirmou a presença para tal.');
         return redirect()->route('autoTeamCreate');
 
         $result = false;

@@ -13,7 +13,13 @@
         </div>
     </div>
     <div class="card-body">
-        Use esse formulário para convidar todos os jogadores registrados para participarem de uma partidas.<br />
+        <div class="row">
+            <div class="col">
+                <p class="text-justfy">
+                    Use esse formulário para convidar todos os jogadores registrados para participarem de uma partidas.
+                </p>
+            </div>
+        </div>
         @include('components.form_template', ['route'=>route('autoPresenceStore'),'formID'=>"autoPresence",'visibiles'=>[0,1,3],'fields'=>$fields['matchesPresence']])
     </div>
     <div class="card-footer">
@@ -32,8 +38,17 @@
         </div>
     </div>
     <div class="card-body">
-        Use esse quadro para sortear os jogadores em um times para uma partidas.<br />
-        Só serão sorteados os jogadores que confirmaram presença na partida<br />
+        <div class="row">
+            <div class="col-12">
+                <p class="text-justfy">
+                    Use esse quadro para sortear os jogadores em um times para uma partidas.<br />
+                    Só serão sorteados os jogadores que confirmaram presença na partida<br />
+                </p>
+                <p class="text-info">
+                    Obs.: Os goleiros serão sorteados para cada time formado.
+                </p>
+            </div>
+        </div>
         @include('components.form_template', ['route'=>route('autoTeamStore'),'formID'=>"drawTeams",'visibiles'=>[0,1,3],'fields'=>$fields['matchesTeam']])
     </div>
     <div class="card-footer">

@@ -141,7 +141,7 @@ class Automations extends Controller
         $fields = [
           'matchesTeam' => [
             'match_id' => ['type'=>'dataSelect', 'label'=>'Partidas', 'enabled'=>'1', 'position'=>1, 'notnull'=>0, 'visible'=>0, 'arraykeyval'=>$matches],
-            'numPlayer' => ['type'=>'number', 'label'=>'Quantidade de jogadores por time, incluindo o goleiro', 'enabled'=>1, 'position'=>2, 'notnull'=>0, 'visible'=>0, 'min'=>3, 'max'=>7],
+            'numPlayer' => ['type'=>'number', 'label'=>'Quantidade de jogadores por time.', 'enabled'=>1, 'position'=>2, 'notnull'=>0, 'visible'=>0, 'min'=>3, 'max'=>6],
           ],
         ];
 
@@ -168,8 +168,20 @@ class Automations extends Controller
         ]);
 
         $error = false;
+        // Adicionando um goleiro para o time
+        $numPlayer = ($request->numPlayer + 1);
 
-        $qntPlayer = $request->numPlayer * 2;
+        if ($request->numPlayer > 7) {
+            $error = true;
+            $message = "A quantidade de jogadores por time não pode ser maior do que 7, quantidade informada ({$request->numPlayer}). Obs.: Um goleiro será adcionado a quantidade de jogadores informado.";
+        }
+
+        if ($request->numPlayer < 3) {
+            $error = true;
+            $message = "A quantidade de jogadores por time não pode ser menor do que 3, quantidade informada ({$request->numPlayer}). Obs.: Um goleiro será adcionado a quantidade de jogadores informado.";
+        }
+
+        $qntPlayer = $numPlayer * 2;
         $match = Match::where('id', '=', $request->match_id)->select('name')->get();
         $match = json_decode($match[0]);
 
@@ -183,14 +195,15 @@ class Automations extends Controller
         select('presences.play_id','presences.id','presences.confirmed_at','players.name as jogador','players.nivel_id', 'n.name as nivel','players.goalkeeper','players.user_id')->get();
         $players = json_decode($players);
 
-        #print "match_id: {$request->match_id} - {$match->name}<br />numPlayer: {$request->numPlayer}<br /><pre>";print_r($players);print "</pre>Confirmados: ".count($players)."<br />Jogadores: {$qntPlayer}<br />";
-        $teamsFormade = (count($players) / $request->numPlayer);
-        $aroundTeams = intval($teamsFormade);
+        #print "match_id: {$request->match_id} - {$match->name}<br />numPlayer: enviados-({$request->numPlayer}) +goleiro-{$numPlayer}<br />Confirmados: ".count($players)."<br />Jogadores: {$qntPlayer}<br />";
+        #print "<pre>";print_r($players);print "</pre>";
+
+        $teamsFormade = (count($players) / $numPlayer);
+        $aroundDownTeams = intval($teamsFormade);
         $aroundUpTeams = ceil($teamsFormade);
-        #print "Times a formar: {$teamsFormade} ({$aroundTeams}) [{$aroundUpTeams}]<br />";
+        #print "Times a formar: {$teamsFormade} ({$aroundDownTeams}) [{$aroundUpTeams}]<br />";
         if (count($players) < $qntPlayer) {
-            $msg_text = "Não é possível realizar o sorteio pois a quantidade de jogadores confirmados para a partida '{$match->name}' não é o susficiente para formar no mínimo dois times";
-            $msg_level = 'danger';
+            $message = "Não é possível realizar o sorteio pois a quantidade de jogadores confirmados para a partida '{$match->name}' não é o susficiente para formar no mínimo dois times";
             $error = true;
         }
 
@@ -207,25 +220,27 @@ class Automations extends Controller
                     $playersline[] = $value;
                 }
             }
-            #print "Jogadores numPlayers: {$numPlayers}<br />";
-            #print "Goleiros numGoals: {$numGoals}<br />";
+            #print "Jogadores numPlayers: {$numPlayers} | Goleiros numGoals: {$numGoals}<br />";
             // se nao tem goleiros suficiente para os times nao faz o sorteio
             if ($numGoals < $aroundUpTeams) {
-                $msg_text = "Não é possível realizar o sorteio da partida '{$match->name}', pois não há goleiros sufucientes para formar {$aroundUpTeams} times. Há ({$numPlayers}) Jogadores e ({$numGoals}) Goleiros confirmados.";
-                $msg_level = 'danger';
+                $message = "Não é possível realizar o sorteio da partida '{$match->name}', pois não há goleiros sufucientes para formar {$aroundUpTeams} times. Há ({$numPlayers}) Jogadores e ({$numGoals}) Goleiros confirmados.";
                 $error = true;
             }
         }
 
         if ($error) {
-            $message = self::message($msg_level, $msg_text);
+            $msg_level = 'danger';
+            self::message($msg_level, $message);
             return redirect()->route('autoTeamCreate');
         } else {
 
-            // seleciona os jogadores para os times e define a quantidade de times
+            // Sorteado os jogadores para formar times
             $list=[];
             $playSelect = array_rand($playersline, $numPlayers);
+            #print "Qtd de Craques: ".array_count_values($playSelect);
+            #print "Jogadores sorteados<pre>";print_r($playSelect);print '</pre>';
             foreach ($playSelect as $key => $value) {
+                $nivel[$value] = $playersline[$value]->nivel;
                 $list[] = [
                     'id' => $playersline[$value]->id,
                     'play_id' => $playersline[$value]->play_id,
@@ -235,16 +250,20 @@ class Automations extends Controller
                     'goalkeeper' => $playersline[$value]->goalkeeper
                 ];
             }
+            #print "Jogadores sorteados: nivel<pre>";print_r($nivel);print '</pre>';
             $playList = count($list);
-            #print "list<pre>";print_r($list);print '</pre>';
-            $playTeam = array_chunk($list, ($request->numPlayer - 1));
+            #print "Jogadores escolhidos<pre>";print_r($list);print '</pre>';
+
+            // distruibindo os jogadores
+            $playTeam = array_chunk($list, ($numPlayer - 1));
+            // definindo a quantidade de times
             $teams = count($playTeam);
-            print "playTeam jogadores(".($request->numPlayer - 1).") Times [{$teams}]<pre>";print_r($playTeam);print '</pre>';
+            #print "Jogadores por time (".($numPlayer - 1).") Times [{$teams}]<pre>";print_r($playTeam);print '</pre>';
 
             // seleciona os goleiros para os times
             $list=[];
             $goalSelect = array_rand($goalkeepers, $teams);
-            print "goalSelect<pre>";print_r($goalSelect);print '</pre>';
+            #print "goalSelect<pre>";print_r($goalSelect);print '</pre>';
             foreach ($goalSelect as $key => $value) {
                 $list[] = [
                     'id' => $goalkeepers[$value]->id,
@@ -256,7 +275,7 @@ class Automations extends Controller
                 ];
             }
             $goalTeam = $list;
-            print "goalTeam jogadores(1) Times [{$teams}]<pre>";print_r($goalTeam);print '</pre>';
+            #print "goalTeam jogadores(1) Times [{$teams}]<pre>";print_r($goalTeam);print '</pre>';
 
             // definindo os times
             $list=[];
@@ -275,8 +294,7 @@ class Automations extends Controller
                 $i++;
             }
             $teams = $list;
-            print "Times <pre>";print_r($teams);print '</pre>';
-
+            #print "Times <pre>";print_r($teams);print '</pre>';
             // salvando os times
             foreach ($teams as $key => $value) {
                 #print "{$value['name']}<br />";
@@ -379,7 +397,7 @@ class Automations extends Controller
                     }
                 }
             }
-            print "presenceFields<pre>";print_r($presenceDbg);print '</pre>';
+            #print "presenceFields<pre>";print_r($presenceDbg);print '</pre>';
             // setar a partida como sorteada created_team_at
             $matchData = Match::find($request->match_id);
             $matchFields = [
@@ -388,8 +406,7 @@ class Automations extends Controller
             ];
             $matchData->fill($matchFields);
             $matchData->save();
-
-            print "matchFields<pre>";print_r($matchFields);print '</pre>';
+            #print "matchFields<pre>";print_r($matchFields);print '</pre>';
 
             $message = "Times para partida {$match->name} sorteados com sucesso";
             $status = 'success';
