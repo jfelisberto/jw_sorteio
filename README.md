@@ -18,9 +18,9 @@ Para utilização do sistema tenha em seu servidor os seguintes pacote
 - NPM
 
 Rode os seguintes comandos:
-#composer install
-#npm install
-#npm run dev
+composer install
+npm install
+npm run dev
 
 #php artisan migrate --seed
 
