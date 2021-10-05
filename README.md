@@ -18,23 +18,16 @@ Para utilização do sistema tenha em seu servidor os seguintes pacote
 - NPM
 
 Rode os seguintes comandos:
-<<<<<<< HEAD
-#composer install
-#npm install
-#npm run dev
-
-#php artisan migrate --seed
-=======
 - composer install
 - npm install
 - npm run dev
-- php artisan migrate --seed
->>>>>>> fd4b46a67eeb432eae2b69cd4f718ac68dd53cc6
+- php artisan migrate
+- php artisan db:seed --class=NivelsSeeder
 
 ## Segurança e vulnerabilidades
 
 Se você descobrir uma vulnerabilidade de segurança em Sorteio de Times, envie um e-mail para
-Juliano Felisberto via [julianoeloi1@gmail.com](mailto:julianoeloi1@gmail.com).
+Juliano Felisberto [julianoeloi1@gmail.com](mailto:julianoeloi1@gmail.com).
 
 ## Licença
 Sorteio de Times é um software de código aberto licenciado sob a [MIT license](https://opensource.org/licenses/MIT).
