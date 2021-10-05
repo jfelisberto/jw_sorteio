@@ -115,8 +115,24 @@ class Players extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $result = false;
         $data = false;
         $headTitle = 'Jogador';
@@ -137,6 +153,22 @@ class Players extends Controller
      */
     public function store(PlayerRequest $request)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $data = Player::create($request->all());
 
         if ($data) {
@@ -183,6 +215,22 @@ class Players extends Controller
      */
     public function edit(Request $request, $id)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $data = Player::where('id','=',$id)->get();
         $data = (array)json_decode($data[0]);
 
@@ -217,7 +265,22 @@ class Players extends Controller
      */
     public function update(PlayerRequest $request, $id)
     {
-        #dd($request->all());
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         if ($request->restore == 1) {
             $data = Player::onlyTrashed()->where('id','=',$id)->get();
             $data[0]->restore();
@@ -259,6 +322,22 @@ class Players extends Controller
      */
     public function destroy(Request $request, $id)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $deleted_by = Player::find($id);
         $deleted_by->update(['deleted_by' => Auth::user()->id]);
         $deleted_by->save();

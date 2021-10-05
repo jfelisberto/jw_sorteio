@@ -61,8 +61,24 @@ class Automations extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function createPresence()
+    public function createPresence(Request $request)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $matches = Match::whereNull('closed_at')->
         orderby('name', 'ASC')->pluck('name', 'id');
 
@@ -89,6 +105,22 @@ class Automations extends Controller
      */
     public function automationPresence(Request $request)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $request->validate([
             'match_id' => 'required',
         ]);
@@ -132,8 +164,23 @@ class Automations extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function createTeam()
+    public function createTeam(Request $request)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
 
         $matches = Match::whereNull('created_team_at')->whereNull('closed_at')->
         orderby('name', 'ASC')->pluck('name', 'id');
@@ -162,6 +209,22 @@ class Automations extends Controller
      */
     public function automationTeam(Request $request)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $validation = $request->validate([
             'match_id' => 'required',
             'numPlayer' => 'required',

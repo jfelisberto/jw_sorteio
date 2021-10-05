@@ -121,8 +121,24 @@ class Matches extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $result = false;
         $data = false;
         $headTitle = 'Partida';
@@ -143,6 +159,22 @@ class Matches extends Controller
      */
     public function store(MatchRequest $request)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $data = Match::create($request->all());
 
         if ($data) {
@@ -185,6 +217,22 @@ class Matches extends Controller
      */
     public function edit(Request $request, $id)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $data = Match::where('id','=',$id)->get();
         $data = (array)json_decode($data[0]);
 
@@ -225,6 +273,22 @@ class Matches extends Controller
      */
     public function update(MatchRequest $request, $id)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         if ($request->restore == 1) {
             $data = Match::onlyTrashed()->where('id','=',$id)->get();
             $data[0]->restore();
@@ -267,6 +331,22 @@ class Matches extends Controller
      */
     public function updateClosed(Request $request, $id)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $data = Match::find($id);
         $data->fill([
             'closed_at'=>date('Y-m-d H:m:i', time()),
@@ -299,6 +379,22 @@ class Matches extends Controller
      */
     public function destroy(Request $request, $id)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $deleted_by = Match::find($id);
         $deleted_by->update(['deleted_by' => Auth::user()->id]);
         $deleted_by->save();

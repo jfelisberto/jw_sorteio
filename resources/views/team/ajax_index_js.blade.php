@@ -67,9 +67,11 @@
                 }, 'sClass': 'text-center', "targets": 9},
                 {"render": function(data, type, row) {
                     if(checkIsNull(row.isDeleted)) {
-                        content = '';
-                        //content = '<a href="' + basePath + '{{ $here }}/' + row.id + '/edit" class="btn btn-primary btn-sm" title="Editar o registro"><i class="far fa-edit"></i> Editar</a>&nbsp;&nbsp;';
-                        content += '<button type="button" class="btn btn-danger btn-sm delete" title="Apagar o registro" data-id="' + row.id + '" data-name="' + row.name + '"><i class="far fa-trash-alt"></i> Apagar</button>';
+                        if (checkIsNull(row.match_deleted_at) && checkIsNull(row.match_closed_at)) {
+                            content = '<button type="button" class="btn btn-danger btn-sm delete" title="Apagar o registro" data-id="' + row.id + '" data-name="' + row.name + '"><i class="far fa-trash-alt"></i> Apagar</button>';
+                        } else {
+                            content = '<button type="button" class="btn btn-light btn-sm">Partida encerrada</button>';
+                        }
                     } else {
                         content = '<b class="text-danger">' + row.isDeleted + '</b><br />';
                     }

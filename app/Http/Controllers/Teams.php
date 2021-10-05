@@ -93,47 +93,48 @@ class Teams extends Controller
     public function index(Request $request)
     {
         $data = Team::all();
-
+        #print "user: (".Auth::user()->id.") role: (".Auth::user()->admin.")";
         if (count($data) >= 1) {
             foreach ($data as $key => $value) {
                 if ($value->match_id) {
-                    $match = Match::where('id', '=', $value->match_id)->select('name', 'deleted_at')->withTrashed()->get();
+                    $match = Match::where('id', '=', $value->match_id)->select('name', 'deleted_at', 'closed_at')->withTrashed()->get();
                     $value['match'] = $match[0]->name;
+                    $value['match_closed_at'] = $match[0]->closed_at;
                     if (isSet($match[0]->deleted_at)) $value['match_deleted_at'] = $match[0]->deleted_at;
                 } else { $value['match'] = ''; }
                 if ($value->attacker) {
-                    $player = Player::where('id', '=', $value->attacker)->select('name', 'deleted_at')->withTrashed()->get();
-                    $value['attacker_name'] = $player[0]->name;
+                    $player = Player::join('nivels', 'players.nivel_id', '=', 'nivels.id')->where('players.id', '=', $value->attacker)->select('players.name', 'players.deleted_at','nivels.name as nivel')->withTrashed()->get();
+                    $value['attacker_name'] = "{$player[0]->name}<br /><small>{$player[0]->nivel}</small>";
                     if (isSet($player[0]->deleted_at)) $value['attacker_deleted_at'] = $player[0]->deleted_at;
                 } else { $value['attacker_name'] = ''; }
                 if ($value->midfield_left) {
-                    $player = Player::where('id', '=', $value->midfield_left)->select('name', 'deleted_at')->withTrashed()->get();
-                    $value['midfield_left_name'] = $player[0]->name;
+                    $player = Player::join('nivels', 'players.nivel_id', '=', 'nivels.id')->where('players.id', '=', $value->midfield_left)->select('players.name', 'players.deleted_at','nivels.name as nivel')->withTrashed()->get();
+                    $value['midfield_left_name'] = "{$player[0]->name}<br /><small>{$player[0]->nivel}</small>";
                     if (isSet($player[0]->deleted_at)) $value['midfield_left_deleted_at'] = $player[0]->deleted_at;
                 } else { $value['midfield_left_name'] = ''; }
                 if ($value->midfield_right) {
-                    $player = Player::where('id', '=', $value->midfield_right)->select('name', 'deleted_at')->withTrashed()->get();
-                    $value['midfield_right_name'] = $player[0]->name;
+                    $player = Player::join('nivels', 'players.nivel_id', '=', 'nivels.id')->where('players.id', '=', $value->midfield_right)->select('players.name', 'players.deleted_at','nivels.name as nivel')->withTrashed()->get();
+                    $value['midfield_right_name'] = "{$player[0]->name}<br /><small>{$player[0]->nivel}</small>";
                     if (isSet($player[0]->deleted_at)) $value['midfield_right_deleted_at'] = $player[0]->deleted_at;
                 } else { $value['midfield_right_name'] = ''; }
                 if ($value->wing_left) {
-                    $player = Player::where('id', '=', $value->wing_left)->select('name', 'deleted_at')->withTrashed()->get();
-                    $value['wing_left_name'] = $player[0]->name;
+                    $player = Player::join('nivels', 'players.nivel_id', '=', 'nivels.id')->where('players.id', '=', $value->wing_left)->select('players.name', 'players.deleted_at','nivels.name as nivel')->withTrashed()->get();
+                    $value['wing_left_name'] = "{$player[0]->name}<br /><small>{$player[0]->nivel}</small>";
                     if (isSet($player[0]->deleted_at)) $value['wing_left_deleted_at'] = $player[0]->deleted_at;
                 } else { $value['wing_left_name'] = ''; }
                 if ($value->wing_right) {
-                    $player = Player::where('id', '=', $value->wing_right)->select('name', 'deleted_at')->withTrashed()->get();
-                    $value['wing_right_name'] = $player[0]->name;
+                    $player = Player::join('nivels', 'players.nivel_id', '=', 'nivels.id')->where('players.id', '=', $value->wing_right)->select('players.name', 'players.deleted_at','nivels.name as nivel')->withTrashed()->get();
+                    $value['wing_right_name'] = "{$player[0]->name}<br /><small>{$player[0]->nivel}</small>";
                     if (isSet($player[0]->deleted_at)) $value['wing_right_deleted_at'] = $player[0]->deleted_at;
                 } else { $value['wing_right_name'] = ''; }
                 if ($value->defender) {
-                    $player = Player::where('id', '=', $value->defender)->select('name', 'deleted_at')->withTrashed()->get();
-                    $value['defender_name'] = $player[0]->name;
+                    $player = Player::join('nivels', 'players.nivel_id', '=', 'nivels.id')->where('players.id', '=', $value->defender)->select('players.name', 'players.deleted_at','nivels.name as nivel')->withTrashed()->get();
+                    $value['defender_name'] = "{$player[0]->name}<br /><small>{$player[0]->nivel}</small>";
                     if (isSet($player[0]->deleted_at)) $value['defender_deleted_at'] = $player[0]->deleted_at;
                 } else { $value['defender_name'] = ''; }
                 if ($value->goalkeeper) {
-                    $player = Player::where('id', '=', $value->goalkeeper)->select('name', 'deleted_at')->withTrashed()->get();
-                    $value['goalkeeper_name'] = $player[0]->name;
+                    $player = Player::join('nivels', 'players.nivel_id', '=', 'nivels.id')->where('players.id', '=', $value->goalkeeper)->select('players.name', 'players.deleted_at','nivels.name as nivel')->withTrashed()->get();
+                    $value['goalkeeper_name'] = "{$player[0]->name}<br /><small>{$player[0]->nivel}</small>";
                     if (isSet($player[0]->deleted_at)) $value['goalkeeper_deleted_at'] = $player[0]->deleted_at;
                 } else { $value['goalkeeper_name'] = ''; }
                 $result[] = $value;
@@ -161,8 +162,24 @@ class Teams extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         #$message = self::message('info', sprintf('Para criar Times utilize a %s%s%s para sortear os times baseados na partida e em quem confirmou a presença para tal.', '<a href="'.route('automations').'">', 'Automatização de tarefas', '</a>'));
         self::message('info', 'Para criar Times utilize a Automatização de tarefas para sortear os times baseados na partida e em quem confirmou a presença para tal.');
         return redirect()->route('autoTeamCreate');
@@ -187,6 +204,22 @@ class Teams extends Controller
      */
     public function store(TeamRequest $request)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $data = Team::create($request->all());
 
         if ($data) {
@@ -229,6 +262,22 @@ class Teams extends Controller
      */
     public function edit(Request $request, $id)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $message = self::message('warning', 'Operação não permita.');
         return redirect()->route('teams');
 
@@ -272,6 +321,22 @@ class Teams extends Controller
      */
     public function update(TeamRequest $request, $id)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         if ($request->restore == 1) {
             $data = Team::onlyTrashed()->where('id','=',$id)->get();
             $data[0]->restore();
@@ -313,6 +378,22 @@ class Teams extends Controller
      */
     public function destroy(Request $request, $id)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $deleted_by = Team::find($id);
         $deleted_by->update(['deleted_by' => Auth::user()->id]);
         $deleted_by->save();

@@ -47,12 +47,12 @@
 
     function remove_item(data, status, sweetReturn) {
         console.log(data);
-        location.reload();
+        if (status === 'success') location.reload();
     }
 
     function register_close_item(data, status, sweetReturn) {
         console.log(data);
-        location.reload();
+        if (status === 'success') location.reload();
     }
 
     $(document).ready(function() {

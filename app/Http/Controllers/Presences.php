@@ -135,8 +135,24 @@ class Presences extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $result = false;
         $data = false;
         $headTitle = 'Presenças';
@@ -157,6 +173,22 @@ class Presences extends Controller
      */
     public function store(PresenceRequest $request)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $data = Presence::create($request->all());
 
         if ($data) {
@@ -199,6 +231,22 @@ class Presences extends Controller
      */
     public function edit(Request $request, $id)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $data = Presence::where('id','=',$id)->get();
         $data = (array)json_decode($data[0]);
 
@@ -237,6 +285,22 @@ class Presences extends Controller
      */
     public function update(PresenceRequest $request, $id)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         if ($request->restore == 1) {
             $data = Presence::onlyTrashed()->where('id','=',$id)->get();
             $data[0]->restore();
@@ -284,6 +348,26 @@ class Presences extends Controller
      */
     public function updateConfirm(Request $request, $id)
     {
+        if (!Auth::user()->admin) {
+            $check = Presence::join('players', 'presences.play_id', '=', 'players.id')->where('presences.id', '=', $id)->select('presences.play_id', 'players.user_id')->withTrashed()->get();
+
+            if ($check[0]->user_id <> Auth::user()->id) {
+                $message = 'Você só pode confirmar a sua presença.';
+                $status = 'error';
+                if ($request->dataReturn == "json") {
+                    $data = [
+                        'data' => false,
+                        'message' => $message,
+                        'status' => $status
+                    ];
+                    return $data;
+                } else {
+                    self::message('danger', $message);
+                    return redirect()->route('dashboard');
+                }
+            }
+        }
+
         $data = Presence::find($id);
         $data->fill([
             'confirmed_at'=>date('Y-m-d H:m:i', time()),
@@ -316,6 +400,22 @@ class Presences extends Controller
      */
     public function destroy(Request $request, $id)
     {
+        if (!Auth::user()->admin) {
+            $message = 'Você não tem acesso para acessar esta area.';
+            $status = 'error';
+            if ($request->dataReturn == "json") {
+                $data = [
+                    'data' => false,
+                    'message' => $message,
+                    'status' => $status
+                ];
+                return $data;
+            } else {
+                self::message('danger', $message);
+                return redirect()->route('dashboard');
+            }
+        }
+
         $deleted_by = Presence::find($id);
         $deleted_by->update(['deleted_by' => Auth::user()->id]);
         $deleted_by->save();
