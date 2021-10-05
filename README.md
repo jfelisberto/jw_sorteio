@@ -18,11 +18,18 @@ Para utilização do sistema tenha em seu servidor os seguintes pacote
 - NPM
 
 Rode os seguintes comandos:
+<<<<<<< HEAD
 #composer install
 #npm install
 #npm run dev
 
 #php artisan migrate --seed
+=======
+- composer install
+- npm install
+- npm run dev
+- php artisan migrate --seed
+>>>>>>> fd4b46a67eeb432eae2b69cd4f718ac68dd53cc6
 
 ## Segurança e vulnerabilidades
 
