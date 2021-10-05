@@ -10,6 +10,20 @@ Esse programa pode ser utilizado para cadastrar os utilizadores do sistema
 ## Contribuição
 Obrigado por considerar contribuir com o Sorteio de Times
 
+## Utilização
+Esse sistema foi criado utilizando o Framework Laravel 8
+Para utilização do sistema tenha em seu servidor os seguintes pacote
+- Composer
+- Laravel
+- NPM
+
+Rode os seguintes comandos:
+#composer install
+#npm install
+#npm run dev
+
+#php artisan migrate --seed
+
 ## Segurança e vulnerabilidades
 
 Se você descobrir uma vulnerabilidade de segurança em Sorteio de Times, envie um e-mail para

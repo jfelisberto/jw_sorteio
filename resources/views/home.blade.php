@@ -3,28 +3,21 @@
 
 @section('stylesheet')
 <style>
-    .bd-placeholder-img {
-      font-size: 1.125rem;
-      text-anchor: middle;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      user-select: none;
-    }
-
-    @media (min-width: 768px) {
-      .bd-placeholder-img-lg {
-        font-size: 3.5rem;
-      }
-    }
-
     .carousel-item {
         height: 32rem;
         background: #777;
-        color: #fff;
         position: relative;
     }
-
-
+    .carousel-item p {
+        color: #000;
+        float: right;
+        bottom: 0;
+        left: 0;
+        right:0;
+        top: 10px;
+        margin-right: 30px !important;
+        position: relative;
+    }
 
     .overlay-image {
         position: absolute;
@@ -37,17 +30,16 @@
         opacity: 0.8;
     }
 </style>
-{{-- <link rel="stylesheet" href="{{ asset('css/carousel.min.css') }}" /> --}}
 @endsection
 
 @section('content')
 <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
     <div class="col-10 col-sm-8 col-lg-6">
         {{-- fazer carrosel --}}
-        <div id="galery" class="carousel carousel-dark slide carousel-fade" data-bs-ride="carousel">
+        <div id="galery" class="carousel carousel-dark slide carousel-fade" data-ride="carousel" data-interval="false">
             <ol class="carousel-indicators">
                 @foreach ($galery as $key => $item)
-                <li data-bs-target="#galery" data-bs-slide-to="{{$key}}" class="{{$item['active']}}" aria-current="true" aria-label="Slide {{($key++)}}"></li>
+                <li data-target="#galery" data-slide-to="{{$key}}" class="{{$item['active']}}" aria-current="true" aria-label="Slide {{($key++)}}"></li>
                 @endforeach
             </ol>
 
@@ -56,29 +48,31 @@
                 <div class="carousel-item {{$item['active']}}">
                     <div class="overlay-image" style="background-image: url({{$item['url']}})"></div>
                     <p>{{$item['alt']}}</p>
-                    {{-- <img src="{{$item['url']}}" class="d-block w-100" alt="{{$item['alt']}}"> --}}
                 </div>
                 @endforeach
             </div>
-            <a href="#galery" class="carousel-control-prev" role="button" data-bs-target="#galery" data-bs-slide="prev">
+            <a href="#galery" class="carousel-control-prev abortDT" role="button" data-target="#galery" data-slide="prev">
                 <span class="sr-only">Anterior</span>
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <i class="fas fa-chevron-left fa-2x fa-fw text-light"></i>
             </a>
-            <a href="#galery" class="carousel-control-next" role="button" data-bs-target="#galery" data-bs-slide="next">
+            <a href="#galery" class="carousel-control-next abortDT" role="button" data-target="#galery" data-slide="next">
                 <span class="sr-only">Próximo</span>
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <i class="fas fa-chevron-right fa-2x fa-fw text-light"></i>
             </a>
         </div>
     </div>
 
     <div class="col-lg-6">
-      <h1 class="display-5 fw-bold lh-1 mb-3">Responsive left-aligned hero with image</h1>
-      <p class="lead">Quickly design and customize responsive mobile-first sites with Bootstrap, the world’s most popular front-end open source toolkit, featuring Sass variables and mixins, responsive grid system, extensive prebuilt components, and powerful JavaScript plugins.</p>
+      <h1 class="display-5 fw-bold lh-1 mb-3">Venha jogar uma bilinha com a gente</h1>
+      <p class="lead">Você acredita no poder do esporte?<br />
+        Nós acreditamos.<br />
+        Venha fazer parte da nossa equipe de jogadores, inscreva-se em nossa plataforma e receba um convite para participar em uma de nossas partidas.
+      </p>
       @guest
       <div class="d-grid gap-2 d-md-flex justify-content-md-start">
         <a href="{{ route('login') }}" class="btn btn-primary btn-lg px-4 me-md-2">{{ __('Login') }}</a>
         &nbsp;&nbsp;&nbsp;&nbsp;
-        <a href="{{ route('register') }}" class="btn btn-outline-secondary btn-lg px-4">{{ __('Register') }}</a>
+        <a href="{{ route('register') }}" class="btn btn-outline-secondary btn-lg px-4">Registre-se</a>
       </div>
       @endguest
     </div>
